@@ -10,9 +10,9 @@ Also, don't expect the development to follow any strict regimen, as my energy fo
 For java things I usually create "plug-and-play" solutions because I find setting up a remote repository annoying (though I may do so in the future to learn). As a result, you might find copied code throughout the project, but I only include JAR files once I'm reasonably sure they're stable.
 
 # Project philosophy
-I wanted to create some java annotation to understand how they work. Also I don't want to use a build system just to make it a bit more intersting and avoid any depencies (Because you can't use compile annotation without exporting them as JAR)
-It turns out the real way lombok works it very complicated (it playies around with the AST directly) and that the Java Annotation system doesn't really suit what I wanted to do, so I built a system to modify files as freely as I wanted. but of course it
-require some work.
+I wanted to create some java annotation to understand how they work. Also, I don't want to use a build system just to make it a bit more interesting and avoid any depencies (Because you can't use compile annotation without exporting them as JAR)
+It turns out the real way lombok works it very complicated (it play around with the AST directly) and that the Java Annotation system doesn't really suit what I wanted to do, so I built a system to modify files as freely as I wanted. but of course it
+require some work. this doesn't mean I won't create any normal annotation, but it may be delayed to when I would implement a framework for dependency injection
 
 
 
