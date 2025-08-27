@@ -1,6 +1,6 @@
-package main.lja;
+package lja;
 
-import main.lja.test.TestAnnotation;
+import lja.test.TestAnnotation;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

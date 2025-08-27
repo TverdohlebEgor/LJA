@@ -1,6 +1,6 @@
-package main.lja.test;
+package lja.test;
 
-import main.lja.Annotation;
+import lja.Annotation;
 
 import java.io.IOException;
 import java.nio.file.Files;

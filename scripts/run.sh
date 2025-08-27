@@ -1,2 +1,2 @@
 bash compile.sh
-java -cp ../target main.lja.ProcessorEntryPoint ${@:1}
+java -cp ../target lja.ProcessorEntryPoint ${@:1}

@@ -1,2 +1,2 @@
 rm -rf ../target
-find ../src/main/lja -name "*.java" -print | xargs javac -d ../target
+find ../src/java/lja -name "*.java" -print | xargs javac -d ../target

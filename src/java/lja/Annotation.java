@@ -1,4 +1,4 @@
-package main.lja;
+package lja;
 
 import java.nio.file.Path;
 

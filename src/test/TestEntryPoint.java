@@ -1,7 +1,21 @@
 package test;
 
+import java.util.logging.Logger;
 public class TestEntryPoint {
+
+    private static final Logger log = Logger.getLogger(TestEntryPoint.class.getName());
     public static void main(String[] args) {
-        new TestAnnotationTest().test();
+		testAnnotation(new TestAnnotationTest(),"Test Annotation");
     }
+
+	public static void testAnnotation(Test test, String name){
+		log.info("Testing "+name);
+		try{
+			test.test();
+			log.info("SUCCESS");
+		} catch(Exception e){
+			log.severe("FAILED");
+			log.severe(e.getMessage());
+		}
+	}
 }
