@@ -1,4 +1,4 @@
-package lja;
+package lja.annotation;
 
 import java.nio.file.Path;
 

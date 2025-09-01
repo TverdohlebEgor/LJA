@@ -1,6 +1,6 @@
-package lja.test;
+package lja.annotation.test;
 
-import lja.Annotation;
+import lja.annotation.Annotation;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,7 +11,7 @@ import java.util.List;
 public class TestAnnotation implements Annotation {
     @Override
     public String name(){
-        return "TestAnnotation";
+        return "TestAnnotationI";
     }
     @Override
     public void process(Path filePath) {

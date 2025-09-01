@@ -1,6 +1,7 @@
 package lja;
 
-import lja.test.TestAnnotation;
+import lja.annotation.Annotation;
+import lja.annotation.test.TestAnnotation;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -59,9 +60,7 @@ class ProcessorEntryPoint {
             for(String line : Files.readAllLines(filePath, StandardCharsets.UTF_8)){
                 List<String> tokens = List.of(line.split(" "));
                 if(
-                   tokens.contains("@"+annotation.name()) ||
-                   tokens.contains("//@"+annotation.name()) ||
-                   tokens.contains("/*@"+annotation.name())
+                   tokens.contains("@"+annotation.name())
                 ) {
                     annotation.process(filePath);
                 }
