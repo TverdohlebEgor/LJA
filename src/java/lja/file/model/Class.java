@@ -56,7 +56,7 @@ public class Class {
         if(this.initialLine >= y) this.initialLine+=delta;
         if(this.finalLine >= y) this.finalLine+=delta;
         staticBlock.ifPresent(block -> block.incrementAllHigher(y,delta));
-        methods.stream().forEach(m -> m.incrementAllHigher(y,delta));
+        methods.forEach(m -> m.incrementAllHigher(y,delta));
     }
 
     public Method findMethodByName(String methodName){

@@ -1,7 +1,9 @@
 package lja;
 
 import lja.annotation.Annotation;
-import lja.annotation.test.TestAnnotation;
+import lja.annotation.TestAnnotation;
+import lja.file.model.File;
+import lja.file.util.FileFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -45,7 +47,10 @@ class ProcessorEntryPoint {
         try (Stream<Path> pathStream = Files.walk(targetRoot)) {
             pathStream.filter(Files::isRegularFile).filter(path -> path.toString().endsWith(".java")).forEach(path -> {
                 try {
-                    processAnnotations(path);
+                    File file = FileFactory.fromPath(path);
+                    if(file.hasMainClass()) {
+                        Processor.printAnnotationsUsingReflection(file.getFullClassName());
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

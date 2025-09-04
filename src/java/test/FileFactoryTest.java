@@ -1,5 +1,6 @@
 package test;
 
+import lja.annotation.TestAnnotationI;
 import lja.file.model.File;
 import lja.file.util.FileFactory;
 
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+@TestAnnotationI
 public class FileFactoryTest extends Test{
     private Path path = Path.of(System.getProperty("scriptDir"),"..","src","java","test","FileFactoryTest.java");
     public void test(){

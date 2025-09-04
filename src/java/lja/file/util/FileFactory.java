@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static lja.file.model.FilePieceType.*;
 import static lja.file.util.Constant.accessLevelNames;
@@ -22,6 +23,7 @@ public class FileFactory {
 
       file.addClasses(findClasses(lines));
       file.setImports(findImports(lines));
+      file.setPackage(findPackage(lines));
       for(Class clazz : file.classes()){
          clazz.addMethods(findMethods(clazz.initialLine(),clazz.finalLine(),lines));
          clazz.addClassFields(findClassFields(clazz.initialLine(),clazz.finalLine(),lines));
@@ -34,6 +36,18 @@ public class FileFactory {
       List<String> lines = Files.readAllLines(path);
       normalizeCurlyBrackets(lines);
       return lines;
+   }
+
+   private static String findPackage(List<String> lines){
+      for(String line : lines){
+         List<String> tokens = List.of(line.split(" "));
+         if(tokens.getFirst().equals("package")){
+            String result = tokens.get(1);
+            result = result.substring(0,result.length()-1);
+            return result;
+         }
+      }
+      return null;
    }
 
    private static Imports findImports(List<String> lines){
@@ -55,8 +69,8 @@ public class FileFactory {
       List<ClassField> result = new ArrayList<>();
       for(int liney = initLines; liney <= finalLines; liney++){
          String line = lines.get(liney);
-         if(!line.contains("(") && nextLineIs(liney,lines) != OPENING_BRACKETS){
-            List<String> tokens = List.of(lines.get(liney).split(" "));
+         if(!line.contains("(") && nextLineIs(liney,lines) != OPENING_BRACKETS && nextLineIs(liney-1,lines) == EXPRESSION){
+            List<String> tokens = Arrays.stream(lines.get(liney).split(" ")).collect(Collectors.toCollection(ArrayList::new));
             AccessLevel accessLevel = extractAccessLevel(tokens);
             if(accessLevelNames.contains(tokens.getFirst())){
                tokens.removeFirst();
@@ -92,25 +106,29 @@ public class FileFactory {
             int finalLine = findClosingBracketsOf(liney+1,lines);
 
             String name;
-            List<String> tokens = Arrays.stream(line.split(" ")).filter(t -> t.contains("(")).toList();
+            List<String> tokens = List.of(line.split(" "));
             AccessLevel accessLevel = extractAccessLevel(tokens);
+            tokens = Arrays.stream(line.split(" ")).filter(t -> t.contains("(")).toList();
             name = tokens.getFirst().substring(0,tokens.getFirst().indexOf("("));
 
             List<Field> fields = new ArrayList<>();
             String allMethodFieldsString = line.substring(line.indexOf("(")+1,line.lastIndexOf(")"));
             List<String> fieldList= List.of(allMethodFieldsString.split(","));
-            if(fieldList.size() % 2 != 0){
-               throw new IllegalArgumentException("In this line an odd number of fields have been found, this should be impossible (Every field has type and name) y:" + liney + "\nline: "+line);
+            if(!fieldList.isEmpty() && !fieldList.getFirst().isEmpty()) {
+               for (String couple : fieldList) {
+                  couple = couple.strip();
+                  List<String> singleFieldTokens = List.of(couple.split(" "));
+                  if (singleFieldTokens.size() != 2) {
+                     throw new IllegalArgumentException("In this line an odd number of fields have been found, this should be impossible (Every field has type and name) y:" + liney + "\nline: " + line);
+                  }
+                  fields.add(
+                        new Field(
+                              singleFieldTokens.get(0),
+                              singleFieldTokens.get(1)
+                        )
+                  );
+               }
             }
-            for(int x = 0; x < fieldList.size(); x+=2){
-               fields.add(
-                     new Field(
-                           fieldList.get(x),
-                           fieldList.get(x+1)
-                     )
-               );
-            }
-
             result.add(new Method(
                   initialLine,
                   finalLine,
@@ -119,8 +137,8 @@ public class FileFactory {
                   fields
             ));
          }
+         liney+=1;
       }
-
       return result;
    }
 
@@ -141,10 +159,14 @@ public class FileFactory {
    private static List<Class> findClasses(List<String> lines){
       List<Class> classes = new ArrayList<>();
       for(String line : lines){
-         if(line.contains("class")){
+         if(line.contains("class")
+               && !line.contains(";")
+               && nextLineIs(lines.indexOf(line),lines) == OPENING_BRACKETS
+               && nextLineIs(lines.indexOf(line)-1,lines) == CLASS
+         ){
             int iniLine = lines.indexOf(line);
             int finalLine = findClosingBracketsOf(iniLine+1,lines);
-            List<String> tokens = Arrays.stream(line.split(" ")).toList();
+            List<String> tokens = Arrays.stream(line.split(" ")).collect(Collectors.toCollection(ArrayList::new));
             AccessLevel accessLevel = extractAccessLevel(tokens);
             while(!tokens.getFirst().equals("class")){
                tokens.removeFirst();
@@ -161,9 +183,6 @@ public class FileFactory {
                   )
             );
          }
-      }
-      if(classes.isEmpty()) {
-         throw new IllegalArgumentException("class name not found");
       }
       return classes;
    }
@@ -214,9 +233,16 @@ public class FileFactory {
          return METHOD;
       } else if (lineIsClassField(line,lines)) {
          return CLASS_FIELD;
+      }  else if(line.contains("for (") || line.contains("for(")){
+         return FOR;
+      } else if(line.contains("while (") || line.contains("while(")){
+         return WHILE;
+      } else if(line.contains(";")){
+         return EXPRESSION;
+      } else if(line.contains("class") && !line.contains("(") && !line.contains(")")){
+         return CLASS;
       }
-
-      throw new IllegalArgumentException("Couldn't find which piece is next line:" + lines.get(liney + 1));
+      return NOP;
    }
 
    private static boolean lineIsClassField(String line, List<String> lines){
@@ -226,8 +252,20 @@ public class FileFactory {
 
    private static boolean lineIsMethod(String line, List<String> lines){
       int liney = lines.indexOf(line);
-      List<String> tokens = Arrays.stream(line.split(" ")).filter(t -> t.contains("(")).toList();
-      return !(tokens.getFirst().contains("for") ||  tokens.getFirst().contains("while")) && nextLineIs(liney,lines) == OPENING_BRACKETS;
+      if(!line.contains("(") || line.contains("new") || line.contains("?")) return false;
+      List<String> tokens = Arrays.stream(line.split(" ")).toList();
+      return !tokens.isEmpty() &&
+            !(tokens.getFirst().contains("for")
+                  || tokens.getFirst().contains("while")
+                  || tokens.getFirst().contains("catch")
+                  || tokens.getFirst().contains("try")
+                  || tokens.getFirst().contains("filter")
+                  || tokens.getFirst().contains("forEach")
+                  || tokens.getFirst().contains("switch")
+                  || tokens.getFirst().contains("else")
+                  || tokens.getFirst().contains(".")
+                  || tokens.getFirst().contains("if"))
+            && nextLineIs(liney,lines) == OPENING_BRACKETS;
    }
 
    private static int findClosingBracketsOf(int liney, List<String> lines) {

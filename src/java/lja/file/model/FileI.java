@@ -10,6 +10,7 @@ public interface FileI {
     public List<Class> classes();
 
     public void setImports(Imports newVal);
+    public void setPackage(String newVal);
 
     public void addToStartOfMethod(String methodName, String newLine);
     public void addToStartOfMethod(String className, String methodName, String newLine);
@@ -29,4 +30,6 @@ public interface FileI {
     public void addMethod(List<String> lines, Method method);
     public void addMethod(String className,List<String> lines, Method method);
 
+    public String getFullClassName();
+    public boolean hasMainClass();
 }

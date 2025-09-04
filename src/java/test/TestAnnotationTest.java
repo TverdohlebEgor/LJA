@@ -1,6 +1,6 @@
 package test;
 
-import lja.annotation.test.TestAnnotationI;
+import lja.annotation.TestAnnotationI;
 
 @TestAnnotationI
 public class TestAnnotationTest extends Test {

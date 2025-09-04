@@ -6,5 +6,10 @@ public enum FilePieceType {
     OPENING_BRACKETS,
     CLOSING_BRACKETS,
     STATIC_BLOCK,
-    EOF
+    EXPRESSION,
+    FOR,
+    WHILE,
+    CLASS,
+    EOF,
+    NOP
 }

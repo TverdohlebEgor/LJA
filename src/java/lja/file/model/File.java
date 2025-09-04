@@ -1,14 +1,16 @@
 package lja.file.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class File implements FileI {
 
-   private List<Class> classes;
+   private List<Class> classes = new ArrayList<>();
    private List<String> lines;
    private Imports imports;
    private String fileName;
+   private String allPackage;
    private Class mainClass;
 
    public File(String fileName , List<String> lines){
@@ -30,6 +32,8 @@ public class File implements FileI {
    public void setImports(Imports newVal){
       this.imports = newVal;
    }
+
+   public void setPackage(String newVal){this.allPackage = newVal;}
 
    public List<Class> classes(){
       return classes;
@@ -159,4 +163,7 @@ public class File implements FileI {
    }
    public void addMethod(List<String> lines, Method method){addMethod(mainClass,method,lines);}
    public void addMethod(String className,List<String> lines, Method method){addMethod(findClassByname(className),method,lines);}
+
+   public String getFullClassName(){return allPackage+"."+mainClass.name();}
+   public boolean hasMainClass(){return mainClass != null;}
 }

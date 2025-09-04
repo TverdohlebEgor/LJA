@@ -1,6 +1,4 @@
-package lja.annotation.test;
-
-import lja.annotation.Annotation;
+package lja.annotation;
 
 import java.io.IOException;
 import java.nio.file.Files;
